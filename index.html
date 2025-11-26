@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Font Compare</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1>Font Compare</h1>
+      <div class="controls">
+        <button id="toggle-view-btn" class="btn-secondary">Switch to Overlay</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="font-panel" id="font-panel-1">
+        <div class="upload-area" id="upload-area-1">
+          <input type="file" id="font-upload-1" accept=".ttf,.otf,.woff,.woff2" hidden />
+          <label for="font-upload-1" class="upload-label">
+            <span class="icon">📁</span>
+            <span>Upload Font 1</span>
+          </label>
+          <div class="file-info" id="file-info-1"></div>
+        </div>
+        <div class="metadata-display" id="metadata-1"></div>
+        <div class="variable-controls" id="controls-1"></div>
+      </div>
+
+      <div class="preview-container side-by-side" id="preview-container">
+        <div class="preview-layer layer-1" id="preview-layer-1" contenteditable="true">
+          The quick brown fox jumps over the lazy dog.
+        </div>
+        <div class="preview-layer layer-2" id="preview-layer-2" contenteditable="true">
+          The quick brown fox jumps over the lazy dog.
+        </div>
+      </div>
+
+      <div class="font-panel" id="font-panel-2">
+        <div class="upload-area" id="upload-area-2">
+          <input type="file" id="font-upload-2" accept=".ttf,.otf,.woff,.woff2" hidden />
+          <label for="font-upload-2" class="upload-label">
+            <span class="icon">📁</span>
+            <span>Upload Font 2</span>
+          </label>
+          <div class="file-info" id="file-info-2"></div>
+        </div>
+        <div class="metadata-display" id="metadata-2"></div>
+        <div class="variable-controls" id="controls-2"></div>
+      </div>
+    </main>
+
+    <footer>
+      <p>This project was vibecoded on Google Antigravity.</p>
+    </footer>
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+
+</html>
