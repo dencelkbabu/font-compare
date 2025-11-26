@@ -78,11 +78,13 @@ async function handleFontUpload(event, id) {
         document.fonts.add(fontFace);
 
         // 3. Update State
-        state[`font${id}`] = { font, fontName, axes: {} };
+        const defaults = getDefaults(font);
+        state[`font${id}`] = { font, fontName, axes: { ...defaults }, defaults };
 
         // 4. Apply to Preview
         const previewEl = id === 1 ? elements.previewLayer1 : elements.previewLayer2;
         previewEl.style.fontFamily = fontName;
+        updateFontVariation(id); // Apply defaults immediately
 
         // 5. Render Metadata & Controls
         renderMetadata(font, id);
@@ -92,6 +94,30 @@ async function handleFontUpload(event, id) {
         console.error('Error loading font:', err);
         alert(`Failed to load font: ${err.message}`);
     }
+}
+
+function getDefaults(font) {
+    const defaults = {};
+    if (font.tables.fvar) {
+        font.tables.fvar.axes.forEach(axis => {
+            // Use axis default if present, otherwise fallback
+            if (axis.defaultValue !== undefined) {
+                defaults[axis.tag] = axis.defaultValue;
+            } else {
+                // Fallback logic
+                switch (axis.tag) {
+                    case 'wght': defaults[axis.tag] = 400; break;
+                    case 'wdth': defaults[axis.tag] = 100; break;
+                    case 'slnt': defaults[axis.tag] = 0; break;
+                    case 'ital': defaults[axis.tag] = 0; break;
+                    default: defaults[axis.tag] = (axis.minValue + axis.maxValue) / 2; break;
+                }
+            }
+            // Clamp to range just in case
+            defaults[axis.tag] = Math.max(axis.minValue, Math.min(axis.maxValue, defaults[axis.tag]));
+        });
+    }
+    return defaults;
 }
 
 function renderMetadata(font, id) {
@@ -117,31 +143,61 @@ function renderControls(font, id) {
 
     // Check for variable font axes
     if (font.tables.fvar) {
+        // Global Reset Button
+        const resetAllBtn = document.createElement('button');
+        resetAllBtn.className = 'btn-secondary btn-full';
+        resetAllBtn.textContent = 'Reset All to Defaults';
+        resetAllBtn.onclick = () => resetAll(id);
+        container.appendChild(resetAllBtn);
+
         const axes = font.tables.fvar.axes;
 
         axes.forEach(axis => {
             const group = document.createElement('div');
             group.className = 'control-group';
 
+            const header = document.createElement('div');
+            header.className = 'control-header';
+
             const label = document.createElement('label');
             const name = axis.name.en || axis.tag;
-            label.innerHTML = `<span>${name} (${axis.tag})</span> <span id="val-${id}-${axis.tag}">${axis.defaultValue}</span>`;
+            label.innerHTML = `${name} (${axis.tag})`;
+
+            const valueDisplay = document.createElement('span');
+            valueDisplay.id = `val-${id}-${axis.tag}`;
+            valueDisplay.textContent = state[`font${id}`].axes[axis.tag];
+
+            header.appendChild(label);
+            header.appendChild(valueDisplay);
+
+            const row = document.createElement('div');
+            row.className = 'control-row';
 
             const input = document.createElement('input');
             input.type = 'range';
+            input.id = `input-${id}-${axis.tag}`;
             input.min = axis.minValue;
             input.max = axis.maxValue;
-            input.value = axis.defaultValue;
+            input.value = state[`font${id}`].axes[axis.tag];
             input.step = 1; // Can be refined based on axis
 
             input.addEventListener('input', (e) => {
-                const val = e.target.value;
+                const val = parseFloat(e.target.value);
                 document.getElementById(`val-${id}-${axis.tag}`).textContent = val;
                 updateFontVariation(id, axis.tag, val);
             });
 
-            group.appendChild(label);
-            group.appendChild(input);
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'btn-icon';
+            resetBtn.innerHTML = '↺'; // Refresh/Reset icon
+            resetBtn.title = 'Reset this axis';
+            resetBtn.onclick = () => resetAxis(id, axis.tag);
+
+            row.appendChild(input);
+            row.appendChild(resetBtn);
+
+            group.appendChild(header);
+            group.appendChild(row);
             container.appendChild(group);
         });
     } else {
@@ -149,11 +205,41 @@ function renderControls(font, id) {
     }
 }
 
+function resetAxis(id, tag) {
+    const defaults = state[`font${id}`].defaults;
+    const val = defaults[tag];
+
+    // Update State
+    updateFontVariation(id, tag, val);
+
+    // Update UI
+    const input = document.getElementById(`input-${id}-${tag}`);
+    const display = document.getElementById(`val-${id}-${tag}`);
+    if (input) input.value = val;
+    if (display) display.textContent = val;
+}
+
+function resetAll(id) {
+    const defaults = state[`font${id}`].defaults;
+
+    Object.entries(defaults).forEach(([tag, val]) => {
+        updateFontVariation(id, tag, val);
+
+        // Update UI
+        const input = document.getElementById(`input-${id}-${tag}`);
+        const display = document.getElementById(`val-${id}-${tag}`);
+        if (input) input.value = val;
+        if (display) display.textContent = val;
+    });
+}
+
 function updateFontVariation(id, tag, value) {
     const currentFontState = state[`font${id}`];
     if (!currentFontState) return;
 
-    currentFontState.axes[tag] = value;
+    if (tag && value !== undefined) {
+        currentFontState.axes[tag] = value;
+    }
 
     // Construct font-variation-settings string
     const settings = Object.entries(currentFontState.axes)
