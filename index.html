@@ -36,6 +36,40 @@
       </div>
 
       <div class="preview-container side-by-side" id="preview-container">
+        <div class="overlay-controls" id="overlay-controls">
+          <div class="layer-control-group">
+            <div class="layer-header">
+              <div class="layer-info">
+                <span class="color-dot layer-1-dot"></span>
+                <span class="layer-title">Font 1</span>
+              </div>
+              <label class="visibility-toggle">
+                <input type="checkbox" id="toggle-1" checked>
+                <span>Visible</span>
+              </label>
+            </div>
+            <div class="opacity-control">
+              <label for="opacity-1">Opacity</label>
+              <input type="range" id="opacity-1" min="0" max="1" step="0.05" value="1">
+            </div>
+          </div>
+          <div class="layer-control-group">
+            <div class="layer-header">
+              <div class="layer-info">
+                <span class="color-dot layer-2-dot"></span>
+                <span class="layer-title">Font 2</span>
+              </div>
+              <label class="visibility-toggle">
+                <input type="checkbox" id="toggle-2" checked>
+                <span>Visible</span>
+              </label>
+            </div>
+            <div class="opacity-control">
+              <label for="opacity-2">Opacity</label>
+              <input type="range" id="opacity-2" min="0" max="1" step="0.05" value="1">
+            </div>
+          </div>
+        </div>
         <div class="preview-layer layer-1" id="preview-layer-1" contenteditable="true">
           The quick brown fox jumps over the lazy dog.
         </div>
@@ -59,7 +93,7 @@
     </main>
 
     <footer>
-      <p>This project was vibecoded on Google Antigravity.</p>
+      <p>made with ❤️ in Google Antigravity | v0.3</p>
     </footer>
   </div>
   <script type="module" src="/main.js"></script>

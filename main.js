@@ -20,6 +20,10 @@ const elements = {
     previewLayer1: document.getElementById('preview-layer-1'),
     previewLayer2: document.getElementById('preview-layer-2'),
     toggleViewBtn: document.getElementById('toggle-view-btn'),
+    toggle1: document.getElementById('toggle-1'),
+    toggle2: document.getElementById('toggle-2'),
+    opacity1: document.getElementById('opacity-1'),
+    opacity2: document.getElementById('opacity-2'),
 };
 
 // Event Listeners
@@ -30,6 +34,22 @@ elements.toggleViewBtn.addEventListener('click', () => {
     state.viewMode = state.viewMode === 'overlay' ? 'side-by-side' : 'overlay';
     updateViewMode();
 });
+
+// Overlay Controls
+elements.toggle1.addEventListener('change', (e) => toggleLayer(1, e.target.checked));
+elements.toggle2.addEventListener('change', (e) => toggleLayer(2, e.target.checked));
+elements.opacity1.addEventListener('input', (e) => updateOpacity(1, e.target.value));
+elements.opacity2.addEventListener('input', (e) => updateOpacity(2, e.target.value));
+
+function toggleLayer(id, isVisible) {
+    const layer = id === 1 ? elements.previewLayer1 : elements.previewLayer2;
+    layer.style.display = isVisible ? 'block' : 'none';
+}
+
+function updateOpacity(id, value) {
+    const layer = id === 1 ? elements.previewLayer1 : elements.previewLayer2;
+    layer.style.opacity = value;
+}
 
 // Sync text changes
 elements.previewLayer1.addEventListener('input', (e) => {
@@ -51,11 +71,28 @@ function updateViewMode() {
         elements.previewContainer.classList.remove('overlay-mode');
         elements.previewContainer.classList.add('side-by-side');
         elements.toggleViewBtn.textContent = 'Switch to Overlay';
+
+        // Reset Visibility & Opacity when switching to side-by-side
+        resetVisibility();
     } else {
         elements.previewContainer.classList.remove('side-by-side');
         elements.previewContainer.classList.add('overlay-mode');
         elements.toggleViewBtn.textContent = 'Switch to Side-by-Side';
     }
+}
+
+function resetVisibility() {
+    // Reset UI controls
+    elements.toggle1.checked = true;
+    elements.toggle2.checked = true;
+    elements.opacity1.value = 1;
+    elements.opacity2.value = 1;
+
+    // Reset Layer Styles
+    elements.previewLayer1.style.display = '';
+    elements.previewLayer2.style.display = '';
+    elements.previewLayer1.style.opacity = '';
+    elements.previewLayer2.style.opacity = '';
 }
 
 async function handleFontUpload(event, id) {
