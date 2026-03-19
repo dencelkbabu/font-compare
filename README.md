@@ -1,6 +1,12 @@
+
 # Font Compare
 
+Version: v0.4
+
 A local, web-based tool to compare two fonts visually and inspect their metadata. Built with Vite and opentype.js.
+
+> ## Live Deployment at Github Pages 
+>   You can use/view the live version at:  [dencelkbabu.github.io/font-compare](https://dencelkbabu.github.io/font-compare/).
 
 ## Features
 
@@ -27,6 +33,16 @@ A local, web-based tool to compare two fonts visually and inspect their metadata
     ```
 4.  Open the local URL (usually `http://localhost:5173`) in your browser.
 5.  Upload two font files (TTF, OTF, WOFF) and start comparing!
+
+## Deployment
+
+Font Compare is deployed automatically via GitHub Pages. The workflow in `.github/workflows/deploy.yml` does the following:
+
+- Runs on pushes to `master` plus manual `workflow_dispatch` triggers.
+- Installs npm dependencies and builds the Vite app (`npm run build`).
+- Publishes the generated `dist` directory to the `gh-pages` branch via `peaceiris/actions-gh-pages`, which is what GitHub Pages serves.
+
+Ensure the repository’s Pages settings point at the `gh-pages` branch (root) so the generated assets show up at [dencelkbabu.github.io/font-compare](https://dencelkbabu.github.io/font-compare/). You can preview the exact build locally with `npm run preview` before pushing any changes.
 
 ## Credits
 
